@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "aether-os"
+version = "0.1.0"
+description = "An open-source, model-agnostic AI agent kernel: memory hierarchy, governed orchestrator, and an evolved skills system."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "Apache-2.0" }
+authors = [{ name = "Cherry FRANCOIS" }]
+keywords = ["ai", "agents", "llm", "agent-framework", "claude", "skills", "orchestration"]
+dependencies = []  # base kernel is stdlib-only by design
+
+[project.optional-dependencies]
+vector = ["numpy>=1.24"]      # L2 memory tier (embeddings)
+yaml = ["pyyaml>=6"]          # full frontmatter parsing (base tier parses name/description without it)
+dev = ["pytest>=7", "ruff>=0.4", "mypy>=1.8"]
+
+[project.scripts]
+aether = "aether.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/moses607/aether-os"
+Issues = "https://github.com/moses607/aether-os/issues"
+
+[tool.setuptools.packages.find]
+include = ["aether*"]
+
+[tool.ruff]
+line-length = 100
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
