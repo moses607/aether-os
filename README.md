@@ -1,5 +1,7 @@
 # ⚡ Aether OS
 
+![Aether OS — an open-source AI agent kernel: memory, orchestrator, agent council, governance gate, output, with a self-improvement loop](assets/aether-os.png)
+
 **An open-source, model-agnostic AI agent kernel — memory, a governed orchestrator, and an evolved skills system — that any capable model (Claude, GPT-class, local) plugs into.**
 
 Most agent frameworks are either SDK-heavy, locked to one provider, or a pile of skills with no kernel underneath. Aether OS is the opposite bet: **a small, provider-agnostic kernel** — persistent memory + a governed multi-agent orchestrator + an auto-discovered skills system — that you point at *any* model and *any* interface.
