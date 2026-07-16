@@ -4,7 +4,7 @@
 
 Most agent frameworks are either SDK-heavy, locked to one provider, or a pile of skills with no kernel underneath. Aether OS is the opposite bet: **a small, provider-agnostic kernel** — persistent memory + a governed multi-agent orchestrator + an auto-discovered skills system — that you point at *any* model and *any* interface.
 
-> **Status: v0.1 — building in public.** The kernel below is **real, runnable, and tested** (memory, skills, orchestrator, governance, CLI). Vector/graph memory, MCP/VS-Code/web adapters, the self-improving Researcher, sandboxing, and crypto skill-verification are on the [roadmap](ROADMAP.md) and clearly marked as such. No vaporware claims — what's built is built; what's planned says "planned."
+> **Status: v0.2 — building in public.** The kernel below is **real, runnable, and tested**: memory, skills registry, orchestrator (sequential + council), governance, **eval harness**, **cost tracking**, the `Session` API, and the CLI. Vector/graph memory, MCP/VS-Code/web adapters, the self-improving Researcher, sandboxing, and crypto skill-verification are on the [roadmap](ROADMAP.md) and clearly marked as such. No vaporware claims — what's built is built; what's planned says "planned."
 
 [![CI](https://github.com/moses607/aether-os/actions/workflows/ci.yml/badge.svg)](https://github.com/moses607/aether-os/actions) · Apache-2.0 · Python ≥ 3.10 · zero-dependency base tier
 
@@ -25,24 +25,41 @@ python -m aether.cli memories
 python -m aether.cli skills --path skills
 ```
 
-Use the kernel in code (agents are just callables — bring your own model):
+One object wires it all together (agents are just callables — **bring your own model**):
 
 ```python
-from aether.kernel.memory import MemoryStore
-from aether.kernel.orchestrator import Orchestrator, Step
-from aether.kernel.governance import AllowlistPolicy, AuditLog, Governor, Action
+from aether.session import Session
+from aether.kernel.governance import Action, AllowlistPolicy
 
-mem = MemoryStore("aether.db")
-mem.remember("User prefers concise answers", kind="fact")
+s = Session(db="aether.db", skills_path="skills",
+            policy=AllowlistPolicy({"tool": ["memory."]}), approver=ask_human)
 
-# a "council" of independent agents + a judge = reliability by diverse perspective
-orc = Orchestrator()
-result = orc.run_council([agent_a, agent_b, agent_c], task, judge=judge_agent)
+s.remember("User prefers concise answers", kind="fact")
 
-# nothing side-effecting runs without passing policy (deny-by-default) + audit
-gov = Governor(AllowlistPolicy({"tool": ["memory."]}), AuditLog(), approver=ask_human)
-if gov.authorize(Action("tool", "memory.write", risk="high")):
+# The kernel's core value: assemble ONLY the context this task needs
+ctx = s.context_for("write me a hook for a video")
+# -> {"task": ..., "memories": [...], "skills": [{"name": "hooks", "body": ...}]}
+
+# Reliability: independent agents + a judge beat one guess
+result = s.run_council([agent_a, agent_b, agent_c], task, judge=judge_agent)
+
+# Safety: nothing side-effecting runs without policy + (if risky) a human. All audited.
+if s.authorize(Action("tool", "memory.write", risk="high")):
     ...
+```
+
+Measure changes instead of guessing, and see what a run costs:
+
+```python
+from aether.kernel.evals import Case, EvalHarness, contains
+from aether.kernel.tracking import Price, UsageTracker
+
+report = EvalHarness(scorer=contains).run(my_agent, [Case("2+2?", expect="4")])
+print(report.summary())        # cases=1 pass_rate=100% mean_score=1.00 failures=0
+
+usage = UsageTracker({"my-model": Price(input_per_mtok=3.0, output_per_mtok=15.0)})
+usage.record("researcher", "my-model", prompt_tokens=1200, completion_tokens=300)
+print(usage.report())          # prices are yours to supply — stale tables lie about spend
 ```
 
 ---

@@ -50,9 +50,9 @@ Design goals for the next milestone. None of these are built yet.
   the single kernel API (per ADR-0007), so MCP-speaking clients can drive Aether.
 - **Self-improving Researcher agent** — a reference agent that gathers information and proposes
   new/updated skills, always subject to governance (deny-by-default + approval).
-- **Cost tracking** — per-run accounting of calls/tokens/spend, recorded alongside the audit
+- ~~**Cost tracking**~~ — **shipped v0.2** (`aether/kernel/tracking.py`): per-agent/model tokens + spend. Prices are user-supplied (a stale hardcoded table lies about spend)
   trail, so governance can reason about budget as a risk dimension.
-- **Evaluation harness** — a repeatable way to measure reliability (including council/debate
+- ~~**Evaluation harness**~~ — **shipped v0.2** (`aether/kernel/evals.py`): cases + scorers + pass-rate report. Still to do: measure council/debate
   gains claimed in ADR-0003). Until this lands, reliability improvements remain **design
   goals**, not measured results.
 
@@ -90,7 +90,7 @@ For organizations that need Aether governed across teams. Not built yet.
 | Horizon | Milestone | Focus |
 |--------|-----------|-------|
 | **Now**   | v0.1 MVP   | Provider-agnostic kernel, SQLite/FTS memory, `SKILL.md`, deny-by-default governance + audit, CLI — **shipped & tested** |
-| **Next**  | v0.5       | Vector + graph memory, MCP adapter, Researcher agent, cost tracking, eval harness — *planned* |
+| **Next**  | v0.5       | Vector + graph memory, MCP adapter, Researcher agent — *planned*  ·  cost tracking + eval harness — **shipped in v0.2** |
 | **Later** | v1.0       | Web dashboard, sandboxing, crypto skill verification, marketplace — *planned* |
 | **Later** | Enterprise | Multi-tenant, RBAC, SSO, audit export, on-prem — *planned* |
 
@@ -104,7 +104,7 @@ Aether is built in public and contributions are welcome. Good places to start:
   interface (keeping the base stdlib-only).
 - **Adapters** — help design the MCP adapter (and later VS Code / web) over the single kernel
   API, keeping surfaces thin.
-- **Eval harness** — build the reliability benchmark so council/debate gains can be **measured**
+- **Reliability benchmark** — use the shipped eval harness to actually **measure** council/debate gains
   rather than asserted.
 - **Skills** — contribute well-scoped `SKILL.md` skills and sharpen the registry conventions.
 - **Governance** — stress-test deny-by-default, risk classification, and the approval flow;
